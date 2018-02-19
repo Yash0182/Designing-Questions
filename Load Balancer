@@ -1,0 +1,87 @@
+import java.util.*;
+
+//Class Defines A Server
+class Server
+{
+    int clientServing;
+    List<Clients> al = new ArrayList();
+    Server()
+    {
+        
+    }
+    public void addClient(Clients c)
+    {
+        al.add(c);
+        clientServing++;
+    }
+    
+}
+
+public class LoadBalancer
+{
+    Server[] servers;
+    int numberServers;
+    LoadBalancer(int numberServers)
+    {
+        this.numberServers = numberServers;             //Creating an array of Servers, depending on the number of Servers we have
+        servers = new Server[numberServers];
+        for(int i=0;i<numberServers;i++)
+        {
+            servers[i]=new Server();
+        }
+    }
+    public void dispatch(Clients c)                     //Dispatches an incoming request to a server
+    {
+        int minServing=servers[0].clientServing;
+        int index=0;
+        for(int i=1;i<numberServers;i++)        
+        {
+            if(minServing>servers[i].clientServing)     //Finds the minimum load server
+            {
+                minServing=servers[i].clientServing;
+                index=i;
+            }
+        }
+        servers[index].addClient(c);
+    }
+    public void dispLoad()
+    {
+        for(int i=0;i<numberServers;i++)
+        {
+            for(Clients cl:servers[i].al)
+            {
+                System.out.println("@Server "+i+" "+cl.website+" Load On Server: "+ servers[i].clientServing);
+            }
+        }
+    }
+    public static void main(String[] args)
+    {
+        Clients c = new Clients("GeekForGeeks.com");
+        Clients c1 = new Clients("LeetCode.com");
+        Clients c2 = new Clients("gmail.com");
+        Clients c3 = new Clients("reddit.com");
+        Clients c4 = new Clients("github.com");
+        Clients c5 = new Clients("StackOverFlow.com");
+        Clients c6 = new Clients("MinHeap.com");
+        LoadBalancer lb = new LoadBalancer(3);
+        lb.dispatch(c);
+        lb.dispatch(c1);
+        lb.dispatch(c2);
+        lb.dispatch(c3);
+        lb.dispatch(c4);
+        lb.dispatch(c5);
+        lb.dispatch(c6);
+        
+        lb.dispLoad();
+    }
+}
+
+class Clients
+{
+    String website;
+    Clients(String website)
+    {
+        this.website = website;
+    }
+    
+}
